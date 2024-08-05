@@ -102,22 +102,3 @@ class EventHandler(PatternMatchingEventHandler):
     def on_deleted(self, event):
         print(f"[DEBUG] Evento on_deleted chamado: {event.src_path}")
         self.processa_evento(event=event)
-
-
-# Mudar para teste em produção
-
-# if conn:
-#     print("[DEBUG] Conexão com o banco de dados estabelecida.")
-#     for resultado in resultados:
-#         # Preparar os dados para a atualização
-#         data_to_update = (
-#             ultima_manutencao,  # last: data da última manutenção
-#             resultado[2],       # next_event: duração da próxima manutenção
-#             resultado[3],       # next: data da próxima manutenção
-#             # filtro: linha (line) correspondente no banco de dados
-#             filtro
-#         )
-#         print(f"[DEBUG] Atualizando dados: {data_to_update}")
-#         self.db_handler.update_data(conn, data_to_update)
-#     conn.close()
-#     print("[DEBUG] Conexão com o banco de dados fechada.")
