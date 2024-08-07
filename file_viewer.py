@@ -58,7 +58,8 @@ class EventHandler(PatternMatchingEventHandler):
                                 for resultado in resultados:
                                     # Preparar os dados para a atualização
                                     data_to_update = (
-                                        ultima_manutencao,  # last: data da última manutenção
+                                        # last: data da última manutenção
+                                        ultima_manutencao,
                                         # next_event: duração da próxima manutenção
                                         resultado[2],
                                         # next: data da próxima manutenção

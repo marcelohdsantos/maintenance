@@ -37,13 +37,17 @@ class DBHandler:
 
                 # converter strings de dara para timestamps
                 last, next_data, next_event, filtro = data
+
+                print(f"Saída de Data: {last}, {
+                      next_event}, {next_data}, {filtro}")
+
                 last = datetime.strptime(
                     last, '%Y%m%d%H%M%S') if last else None
                 next_data = datetime.strptime(
                     next_data, '%Y%m%d%H%M%S') if next_data else None
 
                 print("[DEBUG] Executando query de atualização com dados:",
-                      (last, next_data, next_event, filtro))
+                      (last, next_event, next_data, filtro))
                 cursor.execute(
                     insert_query, (last, next_event, next_data, filtro))
             conn.commit()

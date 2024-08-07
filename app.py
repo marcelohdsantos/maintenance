@@ -21,15 +21,13 @@ db_config = {
 if __name__ == '__main__':
     # mapear os diretórios para filtrar
     diretorio_filtros = {
-        # r'C:\\Users\\bc2g8585\\Desktop\\teste_iot\\Line1\\maintenanceCommand.txt': 'S1',
-        # r'C:\\Users\\bc2g8585\\Desktop\\teste_iot\\Line2\\maintenanceCommand.txt': 'S2',
-        r'\\10.58.141.21\\d\\setup_lineS1\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S1',
-        # r'\\10.58.141.22\\d\\setup-lineS2\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S2',
-        # r'\\10.58.141.23\\d\\setup-lineS3\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S3',
-        # r'\\10.58.141.24\\d\\setup-lineS4\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S4',
+        # r'\\10.58.141.25\\d\\setup-lineS5\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S1',
+        # r'\\10.58.141.25\\d\\setup-lineS5\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S2',
+        # r'\\10.58.141.25\\d\\setup-lineS5\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S3',
+        # r'\\10.58.141.25\\d\\setup-lineS5\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S4',
         # r'\\10.58.141.25\\d\\setup-lineS5\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S5',
-        # r'\\10.58.141.26\\d\\setup_lineS6\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S6',
-        # r'\\10.58.141.27\\SetupL7\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S7'
+        # r'\\10.58.141.25\\d\\setup-lineS5\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S6',
+        # r'\\10.58.141.25\\d\\setup-lineS5\\iotsoftware\\SMT_Center_LogAnalyzer\\maintenanceCommand.txt': 'S7',
     }
 
     # verificar e normalizar os caminhos dos arquivos

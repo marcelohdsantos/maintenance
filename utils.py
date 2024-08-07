@@ -35,38 +35,61 @@ def processar_arquivo(arquivo_origem, arquivo_destino, filtro):
         linhas = conteudo.split('\n')
 
         ultima_manutencao = None
+        penultima_manutencao = None
+        duracao_ultima_manutencao = None
+
         for linha in linhas:
             campos = linha.strip().strip('()').split(",")
             campos = [campo.strip("'") for campo in campos]
             if len(campos) > 6:
                 if campos[6] == 'Finished' and campos[2] == filtro:
+                    penultima_manutencao = ultima_manutencao
                     ultima_manutencao = campos[1]
+                    duracao_ultima_manutencao = campos[3]
                 # print(f"[DEBUG] Linha com 'Finished' encontrada: {linha}")
                     print(f"[DEBUG] Última manutenção atualizada para: {
                         ultima_manutencao} para a filtro: {filtro}")
 
-        if ultima_manutencao is None:
-            print(
-                f"[DEBUG] Nenhuma manutenção finalizada encontrada para o filtro: {filtro}")
-        else:
-            print(f"[RESULT] Última manutenção para o filtro {
-                  filtro}: {ultima_manutencao}")
+            if filtro in ['S1', 'S2']:
+                manutencao_a_retorna = penultima_manutencao if penultima_manutencao is not None else ultima_manutencao
+            else:
+                manutencao_a_retorna = ultima_manutencao
+
+            if manutencao_a_retorna is None:
+                print(
+                    f"[DEBUG] Não há manutenções 'Finished' para o filtro: {filtro}")
+            else:
+                print(f"[RESULT] Manutenção a retornar para o filtro {filtro}: {
+                      manutencao_a_retorna} com duração {duracao_ultima_manutencao}")
+
+        # if penultima_manutencao is None:
+        #     print(
+        #         f"[DEBUG] Não há penúltima encontrada para o filtro: {filtro}")
+        #     return ultima_manutencao
+        # else:
+        #     print(f"[RESULT] Penúltima manutenção para o filtro {
+        #           filtro}: {penultima_manutencao}")
 
         linhas_filtradas = [
             linha for linha in linhas if "Finished" not in linha and filtro in linha]
 
         with open(arquivo_destino, 'w') as file:
+
             for linha in linhas_filtradas:
                 file.write(linha + '\n')
 
+        # print(f"[DEBUG] Arquivo {
+        #       arquivo_destino} processado e salvo com sucesso.")
+        # print(f"[DEBUG] Penúltima manutenção para filtro {
+        #       filtro}: {penultima_manutencao}")
+
         print(f"[DEBUG] Arquivo {
               arquivo_destino} processado e salvo com sucesso.")
-        print(f"[DEBUG] Última manutenção para filtro {
-              filtro}: {ultima_manutencao}")
-        return ultima_manutencao
+        return manutencao_a_retorna, duracao_ultima_manutencao
+
     except Exception as e:
         print(f"[ERRO] Erro ao processar o arquivo {arquivo_origem}: {e}")
-        return None
+        return None, None
 
 
 def extrair_dados(arquivo):
@@ -95,15 +118,23 @@ def extrair_datas(dados, filtro):
         for i, dado in enumerate(dados):
             if (dado[4] in ['']) and (dado[6] == 'Waiting'):
                 data_atual_manutencao = dado[1]
-                duracao_manutencao = dado[3]
+                # duracao_manutencao = dado[3]
                 proxima_data_manutencao = dados[i +
                                                 1][1] if i + 1 < len(dados) else None
+
+                # Encontrar a duração da última manutenção 'Finished'
+                duracao_ultima_manutencao = None
+                for j in range(i - 1, -1, -1):
+                    if dados[j][6] == 'Finished' and dados[j][2] == filtro:
+                        duracao_ultima_manutencao = dados[j][3]
+                        break
+
                 resultados.append(
                     (filtro, data_atual_manutencao,
-                     duracao_manutencao, proxima_data_manutencao)
+                     duracao_ultima_manutencao, proxima_data_manutencao)
                 )
                 print(f"[DEBUG] Adicionando ao resultado: {filtro}, {data_atual_manutencao}, {
-                      duracao_manutencao}, {proxima_data_manutencao}")
+                      duracao_ultima_manutencao}, {proxima_data_manutencao}")
                 break
 
         print(f"[DEBUG] Resultados finais: {resultados}")
@@ -125,11 +156,14 @@ def processar_inicialmente(diretorio_filtros, db_config):
         try:
             print(f"[DEBUG] Processando o arquivo inicial: {arquivo_origem}")
 
-            ultima_manutencao = processar_arquivo(
+            ultima_manutencao, duracao_ultima_manutencao = processar_arquivo(
                 arquivo_origem, caminho_arquivo_copia, filtro)
 
             dados = extrair_dados(caminho_arquivo_copia)
             resultados = extrair_datas(dados, filtro)
+
+            print(f"[DEBUG] Resultados que irão ser salvos no banco: {
+                  resultados}")
 
             conn = db_hundler.connect_db()
             if conn:
@@ -137,13 +171,16 @@ def processar_inicialmente(diretorio_filtros, db_config):
                     if len(resultado) < 4:
                         print(f"[ERROR] Resultado inválido: {resultado}")
                     else:
+                        # definir próxima data de manutenção com base nos dados extraídos
+                        proxima_data_manutencao = resultado[1]
+
                         data_to_insert = (
-                            ultima_manutencao,  # última data de manutenção
-                            resultado[3],  # próxima data de manutenção
-                            resultado[2],  # duração da manutenção
+                            ultima_manutencao,
+                            proxima_data_manutencao,
+                            duracao_ultima_manutencao,
                             filtro,
-                            # resultado[1],  # data atual da manutenção
                         )
+
                         print(f"[DEBUG] Inserindo dados: {data_to_insert}")
                         db_hundler.insert_data(conn, data_to_insert)
                     conn.close()
@@ -151,7 +188,7 @@ def processar_inicialmente(diretorio_filtros, db_config):
 
             for resultado in resultados:
                 print(f"[RESULT] Linha {resultado[0]} Data atual de manutenção: {
-                      resultado[1]}, Duração da manutenção: {resultado[2]}, Próxima data de manutenção: {resultado[3]} ")
+                      resultado[1]}, Duração da manutenção: {resultado[2]}, Próxima data de manutenção: {resultado[3]}")
 
             if ultima_manutencao:
                 print(f"[RESULT] Última manutenção para filtro {
