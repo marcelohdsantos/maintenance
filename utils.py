@@ -137,7 +137,7 @@ def extrair_datas(dados, filtro):
                       duracao_ultima_manutencao}, {proxima_data_manutencao}")
                 break
 
-        print(f"[DEBUG] Resultados finais: {resultados}")
+        print(f"[DEBUG] Resultados finais: {resultados}") 
         return resultados
     except Exception as e:
         print(f"[ERRO] Erro ao extrair dados: {e}")
